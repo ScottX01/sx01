@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProtonDB Report Maker</title>
+<style>
+  :root {
+    --bg:        #080808;
+    --bg-raised: #141414;
+    --bg-sel:    #1e2024;
+    --border:    #242424;
+    --border-hi: #383838;
+    --fg:        #bdbdbd;
+    --fg-muted:  #848484;
+    --fg-dim:    #484848;
+    --blue:      #80a0ff;
+    --green:     #8cc85f;
+    --amber:     #e3c78a;
+    --red:       #ff5454;
+    --purple:    #cf87e8;
+    --radius:    5px;
+    --radius-lg: 9px;
+    --font: 'JetBrains Mono', 'Fira Mono', 'Cascadia Code', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--fg-dim); }
+  * { scrollbar-color: var(--border-hi) var(--bg); scrollbar-width: thin; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 14px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1rem 4rem;
+  }
+
+  .app { width: 100%; max-width: 660px; }
+
+  header {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  header h1 { font-size: 15px; font-weight: 600; color: var(--blue); letter-spacing: 0.04em; text-transform: uppercase; }
+  header h1 span { color: var(--fg-dim); font-weight: 400; }
+  header p { font-size: 11px; color: var(--fg-muted); margin-top: 5px; line-height: 1.6; }
+
+  .reset-btn {
+    flex-shrink: 0;
+    padding: 5px 14px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--fg-dim);
+    font-family: var(--font);
+    font-size: 11px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: border-color 0.12s, color 0.12s;
+  }
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .section-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--blue);
+    margin-bottom: 1.25rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field { margin-bottom: 1.4rem; }
+
+  .field-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .field-label .opt {
+    font-size: 9px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: var(--fg-dim);
+  }
+
+  .cat-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+  .cat-chip {
+    padding: 4px 11px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    font-family: var(--font);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    cursor: pointer;
+    color: var(--fg-muted);
+    transition: all 0.1s;
+  }
+  .cat-chip:hover { border-color: var(--border-hi); color: var(--fg); }
+  .cat-chip.on-perfect    { border-color: var(--green); color: var(--green); background: var(--bg-sel); }
+  .cat-chip.on-playable   { border-color: var(--blue);  color: var(--blue);  background: var(--bg-sel); }
+  .cat-chip.on-poor       { border-color: var(--amber); color: var(--amber); background: var(--bg-sel); }
+  .cat-chip.on-unplayable { border-color: var(--red);   color: var(--red);   background: var(--bg-sel); }
+
+  .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; min-height: 26px; }
+
+  .preset-chip {
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--fg-muted);
+    font-family: var(--font);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .preset-chip:hover { border-color: var(--border-hi); color: var(--fg); border-style: solid; }
+  .preset-chip.on { border-style: solid; background: var(--bg-sel); }
+  .preset-chip.on-perfect    { border-color: var(--green); color: var(--green); }
+  .preset-chip.on-playable   { border-color: var(--blue);  color: var(--blue);  }
+  .preset-chip.on-poor       { border-color: var(--amber); color: var(--amber); }
+  .preset-chip.on-unplayable { border-color: var(--red);   color: var(--red);   }
+
+  .preset-hint { font-size: 10px; color: var(--fg-dim); margin-bottom: 7px; }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.12s;
+  }
+  input[type="text"]:focus { border-color: var(--blue); }
+  input[type="text"]::placeholder { color: var(--fg-dim); }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  /* OUTPUT BOX */
+  .output-wrap {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .output-header {
+    padding: 7px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .output-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-dim); }
+  .char-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+    transition: all 0.15s;
+  }
+  .char-pill.warn { border-color: var(--amber); color: var(--amber); }
+  .char-pill.over { border-color: var(--red); color: var(--red); }
+
+  .output-body {
+    padding: 0.9rem 1.1rem;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.75;
+    min-height: 48px;
+    color: var(--fg);
+  }
+  .output-body.empty { color: var(--fg-dim); font-style: italic; }
+  .output-body .md-bold   { color: var(--fg); font-weight: 700; }
+  .output-body .md-hash   { color: var(--blue); }
+  .output-body .md-italic { color: var(--fg-muted); font-style: italic; }
+  .output-body .md-sep    { color: var(--purple); }
+
+  .char-bar-wrap { height: 2px; background: var(--border); }
+  .char-bar { height: 100%; width: 0%; background: var(--blue); transition: width 0.1s, background 0.1s; }
+  .char-bar.warn { background: var(--amber); }
+  .char-bar.over { background: var(--red); }
+
+  .copy-btn {
+    padding: 5px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-hi);
+    background: transparent;
+    color: var(--fg-muted);
+    font-family: var(--font);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.12s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .copy-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .copy-btn.copied { border-color: var(--green) !important; color: var(--green) !important; }
+
+  .output-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  /* NOTES OUTPUT — no char limit bar */
+  .notes-body {
+    padding: 0.9rem 1.1rem;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.85;
+    min-height: 80px;
+    color: var(--fg);
+  }
+  .notes-body .md-bold   { color: var(--fg); font-weight: 700; }
+  .notes-body .md-hash   { color: var(--blue); }
+  .notes-body .md-italic { color: var(--fg-muted); font-style: italic; }
+  .notes-body .md-sep    { color: var(--purple); }
+
+  /* TABS */
+  .tab-bar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 7px 18px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: color 0.12s, border-color 0.12s;
+  }
+  .tab-btn:hover { color: var(--fg); }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* TOOLS TAB */
+  .tool-card {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 1.4rem;
+  }
+  .tool-card-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--blue);
+    margin-bottom: 0.6rem;
+  }
+  .tool-card p {
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-bottom: 0.9rem;
+    line-height: 1.6;
+  }
+  .tool-link {
+    display: inline-block;
+    color: var(--blue);
+    font-size: 12px;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.12s;
+  }
+  .tool-link:hover { border-bottom-color: var(--blue); }
+
+  .code-block-wrap {
+    margin-top: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .code-block-header {
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .code-block-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+  }
+  .code-block-body {
+    padding: 0.75rem 1rem;
+    font-size: 12px;
+    color: var(--green);
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div>
+      <h1>ProtonDB <span>//</span> Report Maker</h1>
+      <p>Summary = plain title (140 chars). Concluding notes = full markdown report.</p>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">⟳ Reset</button>
+  </header>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('report',this)">Report</button>
+    <button class="tab-btn" onclick="switchTab('tools',this)">Tools</button>
+  </div>
+
+  <!-- ═══════════════════════════════ REPORT TAB ═══════════════════════════════ -->
+  <div class="tab-panel active" id="tab-report">
+
+  <!-- ═══════════════════════════════ SUMMARY ═══════════════════════════════ -->
+  <div class="section-title">// Summary — plain text title</div>
+
+  <div class="field">
+    <div class="field-label">Category</div>
+    <div class="cat-row">
+      <button class="cat-chip" onclick="selectCat('perfect',this)">Perfect</button>
+      <button class="cat-chip" onclick="selectCat('playable',this)">Playable</button>
+      <button class="cat-chip" onclick="selectCat('poor',this)">Poor</button>
+      <button class="cat-chip" onclick="selectCat('unplayable',this)">Unplayable</button>
+    </div>
+  </div>
+
+  <div class="field" id="preset-field" style="display:none;">
+    <div class="field-label">Quick presets <span class="opt">loads into field below</span></div>
+    <div class="preset-row" id="preset-row"></div>
+    <p class="preset-hint">// edit the loaded text however you want</p>
+    <input type="text" id="summary-text" placeholder="e.g. Flawless // zero issues, runs out of the box." oninput="updateSummary()" />
+  </div>
+
+  <div class="field">
+    <div class="output-wrap">
+      <div class="output-header">
+        <span class="output-label">Summary output</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="char-pill" id="sum-pill">0 / 140</span>
+          <button class="copy-btn" id="copy-sum" onclick="copySummary()">Copy</button>
+        </div>
+      </div>
+      <div class="output-body empty" id="sum-preview">Pick a category above…</div>
+      <div class="char-bar-wrap"><div class="char-bar" id="sum-bar"></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════ CONCLUDING NOTES ═══════════════════════════════ -->
+  <div class="section-title">// Concluding Notes — markdown report</div>
+
+  <div class="field">
+    <div class="field-label">Runner that worked</div>
+    <input type="text" id="runner" placeholder="e.g. Wine 11.4, GE-Proton10-33, Proton 9.0…" oninput="updateNotes()" />
+  </div>
+
+  <div class="field">
+    <div class="field-label">Launcher <span class="opt">optional</span></div>
+    <input type="text" id="launcher" placeholder="e.g. Lutris, Steam, Bottles…" oninput="updateNotes()" />
+  </div>
+
+  <div class="field">
+    <div class="field-label">Launch options <span class="opt">optional</span></div>
+    <input type="text" id="launchopts" placeholder="e.g. PROTON_NO_ESYNC=1 %command%" oninput="updateNotes()" />
+  </div>
+
+  <div class="field">
+    <div class="field-label">What failed <span class="opt">optional</span></div>
+    <input type="text" id="failed" placeholder="e.g. Proton Experimental &amp; GE-Proton" oninput="updateNotes()" />
+  </div>
+
+  <div class="field">
+    <div class="field-label">Extra notes <span class="opt">optional</span></div>
+    <input type="text" id="extra" placeholder="e.g. audio crackles, minor visual bugs…" oninput="updateNotes()" />
+  </div>
+
+  <div class="field">
+    <div class="field-label">Date tested <span class="opt">optional</span></div>
+    <input type="text" id="datetest" placeholder="e.g. March 2026" oninput="updateNotes()" />
+  </div>
+  <div class="field">
+    <div class="output-wrap">
+      <div class="output-header">
+        <span class="output-label">Concluding notes output</span>
+        <button class="copy-btn" id="copy-notes" onclick="copyNotes()">Copy</button>
+      </div>
+      <div class="notes-body empty" id="notes-preview">Fill in the fields above…</div>
+    </div>
+    <div class="output-footer">
+      <span style="font-size:10px;color:var(--fg-dim);">// markdown is supported in this field on ProtonDB</span>
+    </div>
+  </div>
+
+  </div><!-- /tab-report -->
+
+  <!-- ═══════════════════════════════ TOOLS TAB ═══════════════════════════════ -->
+  <div class="tab-panel" id="tab-tools">
+
+    <div class="section-title">// Tools &amp; Resources</div>
+
+    <div class="tool-card">
+      <div class="tool-card-title">ProtonDB</div>
+      <p>Submit and browse community compatibility reports for games on Linux via Proton.</p>
+      <a class="tool-link" href="https://www.protondb.com" target="_blank">protondb.com ↗</a>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-title">GE-Proton — Latest Version</div>
+      <p>Fetch the latest GE-Proton release tag from GitHub via the API.</p>
+      <div class="code-block-wrap">
+        <div class="code-block-header">
+          <span class="code-block-label">bash</span>
+          <button class="copy-btn" id="copy-ge" onclick="copyCode()">Copy</button>
+        </div>
+        <div class="code-block-body" id="ge-cmd">curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep -oP '"tag_name": "\K[^"]+'</div>
+      </div>
+    </div>
+
+  </div><!-- /tab-tools -->
+
+</div>
+
+<script>
+  const PRESETS = {
+    perfect: [
+      { label: "flawless", val: "Flawless // zero issues, runs out of the box." }
+    ],
+    playable: [
+      { label: "runs well",            val: "Runs well // minor hiccups, nothing game-breaking." },
+      { label: "stutters",             val: "Stutters occasionally // stable enough to finish." },
+      { label: "launch option needed", val: "Launch option required // smooth after that." }
+    ],
+    poor: [
+      { label: "rough",   val: "Rough // playable but not recommended." },
+      { label: "crashes", val: "Crashes mid-session // save frequently." }
+    ],
+    unplayable: [
+      { label: "crash on launch",    val: "Crashes on launch // could not get in-game." },
+      { label: "black screen",       val: "Black screen // no display output at all." },
+      { label: "game-breaking bugs", val: "Game-breaking bugs // unplayable from the start." },
+      { label: "won't launch",       val: "Won't launch // nothing works." }
+    ]
+  };
+
+  let selCat = "";
+
+  function selectCat(cat, btn) {
+    document.querySelectorAll(".cat-chip").forEach(b => b.className = "cat-chip");
+    btn.classList.add("on-" + cat);
+    selCat = cat;
+    renderPresets(cat);
+    document.getElementById("preset-field").style.display = "block";
+    updateSummary();
+    updateNotes();
+  }
+
+  function renderPresets(cat) {
+    const row = document.getElementById("preset-row");
+    row.innerHTML = "";
+    PRESETS[cat].forEach(p => {
+      const btn = document.createElement("button");
+      btn.className = "preset-chip";
+      btn.textContent = p.label;
+      btn.onclick = () => {
+        document.querySelectorAll(".preset-chip").forEach(b => b.className = "preset-chip");
+        btn.classList.add("on", "on-" + cat);
+        document.getElementById("summary-text").value = p.val;
+        updateSummary();
+      };
+      row.appendChild(btn);
+    });
+  }
+
+  function updateSummary() {
+    const text = document.getElementById("summary-text") ? document.getElementById("summary-text").value.trim() : "";
+    const box  = document.getElementById("sum-preview");
+    const pill = document.getElementById("sum-pill");
+    const bar  = document.getElementById("sum-bar");
+
+    if (!text) {
+      box.textContent = "Pick a category above…";
+      box.className = "output-body empty";
+      pill.textContent = "0 / 140";
+      pill.className = "char-pill";
+      bar.style.width = "0%";
+      bar.className = "char-bar";
+      return;
+    }
+
+    box.className = "output-body";
+    box.textContent = text;
+
+    const len = text.length;
+    pill.textContent = len + " / 140";
+    const pct = Math.min((len / 140) * 100, 100);
+    bar.style.width = pct + "%";
+    pill.className = "char-pill" + (len > 140 ? " over" : len > 115 ? " warn" : "");
+    bar.className  = "char-bar"  + (len > 140 ? " over" : len > 115 ? " warn" : "");
+  }
+
+  function buildNotes() {
+    const runner     = document.getElementById("runner").value.trim();
+    const launcher   = document.getElementById("launcher").value.trim();
+    const launchopts = document.getElementById("launchopts").value.trim();
+    const failed     = document.getElementById("failed").value.trim();
+    const extra      = document.getElementById("extra").value.trim();
+    const datetest   = document.getElementById("datetest").value.trim();
+    if (!runner && !selCat) return "";
+
+    let lines = [];
+
+    if (selCat) {
+      const label = selCat.charAt(0).toUpperCase() + selCat.slice(1);
+      lines.push("## " + label);
+      lines.push("");
+    }
+
+    if (failed) lines.push("- **Failed:** " + failed);
+    lines.push("- **Runner:** " + (runner || "—"));
+    if (launcher)   lines.push("- **Launcher:** " + launcher);
+    if (launchopts) lines.push("- **Launch options:** `" + launchopts + "`");
+    if (datetest)   lines.push("- **Tested:** " + datetest);
+
+    if (extra) {
+      lines.push("");
+      let e = extra;
+      if (e[e.length-1] !== ".") e += ".";
+      lines.push("*" + e + "*");
+    }
+
+    lines.push("");
+    lines.push("*Results may vary across distros, hardware, and kernel versions. This is my personal experience and may differ for you.*");
+
+    return lines.join("\n");
+  }
+
+  function updateNotes() {
+    const text = buildNotes();
+    const box  = document.getElementById("notes-preview");
+
+    if (!text) {
+      box.innerHTML = "Fill in the fields above…";
+      box.className = "notes-body empty";
+      return;
+    }
+
+    box.className = "notes-body";
+    box.innerHTML = highlight(text);
+  }
+
+  function highlight(text) {
+    return text
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/^(## .+)$/gm, '<span class="md-hash">$1</span>')
+      .replace(/\*\*(.+?)\*\*/g, '<span class="md-bold">**$1**</span>')
+      .replace(/\*([^*]+)\*/g, '<span class="md-italic">*$1*</span>')
+      .replace(/\/\//g, '<span class="md-sep">//</span>');
+  }
+
+  function copySummary() {
+    const text = document.getElementById("summary-text") ? document.getElementById("summary-text").value.trim() : "";
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => flash("copy-sum"));
+  }
+
+  function copyNotes() {
+    const text = buildNotes();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => flash("copy-notes"));
+  }
+
+  function flash(id) {
+    const btn = document.getElementById(id);
+    const orig = btn.textContent;
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove("copied"); }, 2000);
+  }
+
+  function switchTab(name, btn) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + name).classList.add("active");
+  }
+
+  function copyCode() {
+    const text = document.getElementById("ge-cmd").textContent;
+    navigator.clipboard.writeText(text).then(() => flash("copy-ge"));
+  }
+
+  function resetAll() {
+    selCat = "";
+    document.querySelectorAll(".cat-chip").forEach(b => b.className = "cat-chip");
+    document.getElementById("preset-field").style.display = "none";
+    document.getElementById("preset-row").innerHTML = "";
+    ["summary-text","runner","launcher","launchopts","failed","extra","datetest"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    updateSummary();
+    updateNotes();
+  }
+</script>
+</body>
+</html>
