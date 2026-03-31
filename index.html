@@ -6,623 +6,593 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ScottX01</title>
+<title>scottx01</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
   :root {
-    --bg:         #080808;
-    --bg-raised:  #111111;
-    --bg-sel:     #181a1e;
-    --border:     #1e1e1e;
-    --border-hi:  #2e2e2e;
-    --fg:         #c8c8c8;
-    --fg-muted:   #787878;
-    --fg-dim:     #404040;
-    --blue:       #7aa2f7;
-    --cyan:       #7dcfff;
-    --green:      #9ece6a;
-    --amber:      #e0af68;
-    --red:        #f7768e;
-    --purple:     #bb9af7;
+    --bg:     #0d1117;
+    --bg2:    #010409;
+    --bg3:    #161b22;
+    --border: #21262d;
+    --fg:     #c9d1d9;
+    --muted:  #6e7681;
+    --dim:    #3d444d;
+    --green:  #7ee787;
+    --blue:   #79c0ff;
+    --purple: #d2a8ff;
+    --amber:  #e3b341;
+    --red:    #ff7b72;
+    --cyan:   #56d364;
     --font: 'JetBrains Mono', 'Cascadia Code', 'Fira Mono', monospace;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
-  * { scrollbar-color: var(--border-hi) var(--bg); scrollbar-width: thin; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg2);
     color: var(--fg);
     font-family: var(--font);
     font-size: 13px;
-    line-height: 1.7;
-    overflow-x: hidden;
+    line-height: 1.6;
   }
 
-  /* ─── SCANLINE OVERLAY ─── */
+  /* scanline */
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: repeating-linear-gradient(
       0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.04) 2px,
-      rgba(0,0,0,0.04) 4px
+      transparent, transparent 2px,
+      rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px
     );
     pointer-events: none;
     z-index: 9999;
   }
 
-  /* ─── NAV ─── */
-  nav {
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  * { scrollbar-color: var(--border) var(--bg); scrollbar-width: thin; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+  /* ── TOP BAR ── */
+  #topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    z-index: 100;
-    background: rgba(8,8,8,0.92);
-    backdrop-filter: blur(12px);
+    height: 30px;
+    background: var(--bg3);
     border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    height: 44px;
+    display: flex;
+    align-items: stretch;
+    z-index: 100;
+    user-select: none;
+  }
+  .tb-session {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-  }
-  .nav-logo {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue);
-    letter-spacing: 0.06em;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .nav-logo .prompt { color: var(--fg-dim); }
-  .nav-logo .cursor {
-    display: inline-block;
-    width: 7px; height: 13px;
-    background: var(--blue);
-    animation: blink 1.1s step-end infinite;
-    vertical-align: middle;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-
-  .nav-links {
-    display: flex;
-    gap: 1.6rem;
-    list-style: none;
-  }
-  .nav-links a {
+    padding: 0 16px;
+    gap: 0;
     font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--fg-muted);
-    text-decoration: none;
-    transition: color 0.15s;
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
   }
-  .nav-links a:hover { color: var(--fg); }
-  .nav-links a::before { content: '// '; color: var(--fg-dim); }
-
-  /* ─── LAYOUT ─── */
-  main { padding-top: 44px; }
-
-  section {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 5rem 2rem;
-  }
-
-  .section-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    color: var(--blue);
-    margin-bottom: 2.5rem;
+  .tb-u { color: var(--green); }
+  .tb-s { color: var(--dim); }
+  .tb-h { color: var(--blue); }
+  .tb-p { color: var(--purple); }
+  .tb-tabs {
     display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-label::before { content: '>'; color: var(--green); font-weight: 700; }
-  .section-label::after {
-    content: '';
+    align-items: stretch;
     flex: 1;
-    height: 1px;
-    background: var(--border);
   }
-
-  /* ─── HERO ─── */
-  #hero {
-    min-height: calc(100vh - 44px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 4rem 2rem;
-    max-width: 760px;
-    margin: 0 auto;
-  }
-
-  .hero-eyebrow {
+  .tb-tab {
     font-size: 11px;
-    color: var(--fg-dim);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 1.5rem;
+    padding: 0 18px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    border-right: 1px solid transparent;
+    letter-spacing: 0.04em;
+    transition: color 0.1s, background 0.1s;
+    position: relative;
   }
-  .hero-eyebrow .dot {
+  .tb-tab:hover { color: var(--fg); background: rgba(255,255,255,0.03); }
+  .tb-tab.active {
+    color: var(--fg);
+    background: var(--bg);
+    border-right-color: var(--border);
+    border-left-color: var(--border);
+  }
+  .tb-tab.active::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--green);
+  }
+  .tb-tab:first-child.active { border-left-color: transparent; }
+  .tb-right {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 18px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+    border-left: 1px solid var(--border);
+  }
+  .status-dot {
+    display: inline-block;
     width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--green);
-    animation: pulse 2s ease-in-out infinite;
+    animation: pulse 2.5s ease-in-out infinite;
+    vertical-align: middle;
+    margin-right: 4px;
   }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.75)} }
 
-  .hero-name {
-    font-size: clamp(44px, 10vw, 80px);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    color: var(--fg);
-    margin-bottom: 0.4rem;
+  /* ── MAIN CONTENT ── */
+  #main {
+    position: fixed;
+    top: 30px; left: 0; right: 0; bottom: 22px;
+    overflow-y: auto;
+    background: var(--bg);
+    padding: 36px 52px 52px;
   }
-  .hero-name .accent { color: var(--blue); }
 
-  .hero-handle {
-    font-size: 14px;
-    color: var(--fg-muted);
-    margin-bottom: 2.5rem;
-    letter-spacing: 0.04em;
-  }
-  .hero-handle span { color: var(--purple); }
-
-  .hero-bio {
-    font-size: 14px;
-    color: var(--fg-muted);
-    max-width: 520px;
-    line-height: 1.8;
-    margin-bottom: 3rem;
-    border-left: 2px solid var(--border-hi);
-    padding-left: 1.2rem;
-  }
-  .hero-bio .highlight { color: var(--fg); }
-
-  .hero-links {
+  /* ── BOTTOM BAR ── */
+  #bottombar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 22px;
+    background: var(--bg3);
+    border-top: 1px solid var(--border);
     display: flex;
-    gap: 10px;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 10px;
+    color: var(--dim);
+    z-index: 100;
+    user-select: none;
+    gap: 0;
+  }
+  .bb-sep { margin: 0 12px; color: var(--border); }
+  .bb-right { margin-left: auto; display: flex; align-items: center; gap: 0; }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── PROMPT LINE ── */
+  .prompt {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .pr-u { color: var(--green); }
+  .pr-s { color: var(--dim); }
+  .pr-h { color: var(--blue); }
+  .pr-p { color: var(--purple); }
+  .pr-d { color: var(--muted); white-space: pre; }
+  .pr-c { color: var(--fg); }
+
+  .output {
+    margin-bottom: 32px;
+    padding-left: 0;
+  }
+
+  /* ── HOME ── */
+  .home-name {
+    font-size: clamp(32px, 5.5vw, 58px);
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.025em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .home-name .acc { color: var(--blue); }
+  .home-sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .home-sub .handle { color: var(--purple); }
+  .home-tags {
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+
+  .links-list {
+    display: flex;
+    gap: 6px;
     flex-wrap: wrap;
   }
-  .hero-link {
+  .term-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 7px 16px;
-    background: transparent;
-    border: 1px solid var(--border-hi);
-    border-radius: 4px;
-    color: var(--fg-muted);
+    gap: 5px;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
     text-decoration: none;
-    font-family: var(--font);
     font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    transition: all 0.15s;
-    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
   }
-  .hero-link:hover {
+  .term-link:hover {
     border-color: var(--blue);
     color: var(--blue);
-    background: rgba(122,162,247,0.06);
+    background: rgba(121,192,255,0.05);
   }
-  .hero-link .icon { font-style: normal; font-size: 12px; }
 
-  /* ─── ABOUT ─── */
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
+  /* ── ABOUT ── */
+  .kv-table {
+    width: 100%;
+    border-collapse: collapse;
+    max-width: 680px;
+  }
+  .kv-table tr { border-bottom: 1px solid var(--border); }
+  .kv-table tr:last-child { border-bottom: none; }
+  .kv-key {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--dim);
+    padding: 12px 28px 12px 0;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 110px;
+  }
+  .kv-val {
+    font-size: 12px;
+    color: var(--fg);
+    padding: 12px 0;
+    line-height: 1.75;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 8px;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
+    border-radius: 2px;
+    color: var(--muted);
+    margin: 2px 3px 2px 0;
   }
-  .about-cell {
-    background: var(--bg-raised);
-    padding: 1.5rem;
+  .tag.b { border-color: rgba(121,192,255,0.3); color: var(--blue); }
+  .tag.g { border-color: rgba(126,231,135,0.3); color: var(--green); }
+  .tag.p { border-color: rgba(210,168,255,0.3); color: var(--purple); }
+  .tag.a { border-color: rgba(227,179,65,0.3);  color: var(--amber); }
+  .tag.r { border-color: rgba(255,123,114,0.3); color: var(--red); }
+
+  /* ── PROJECTS ── */
+  .proj-table {
+    width: 100%;
+    border-collapse: collapse;
+    max-width: 820px;
   }
-  .about-cell:nth-child(3) { grid-column: span 2; }
-  .about-cell-label {
+  .proj-table thead tr { border-bottom: 1px solid var(--border); }
+  .proj-table th {
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    color: var(--fg-dim);
-    margin-bottom: 0.6rem;
+    color: var(--dim);
+    padding: 0 24px 10px 0;
+    text-align: left;
+    font-weight: 400;
   }
-  .about-cell-val {
-    font-size: 13px;
-    color: var(--fg);
-    line-height: 1.75;
+  .proj-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
   }
-  .about-cell-val .tag {
-    display: inline-block;
+  .proj-table tbody tr:last-child { border-bottom: none; }
+  .proj-table tbody tr:hover { background: rgba(255,255,255,0.02); }
+  .proj-table td { padding: 16px 24px 16px 0; vertical-align: top; }
+  .proj-id { font-size: 10px; color: var(--dim); white-space: nowrap; }
+  .proj-name { font-size: 13px; color: var(--fg); font-weight: 600; margin-bottom: 4px; }
+  .proj-desc { font-size: 11px; color: var(--muted); line-height: 1.65; max-width: 460px; }
+  .proj-stack { display: flex; gap: 5px; flex-wrap: wrap; }
+  .proj-stack span {
     font-size: 10px;
-    padding: 2px 8px;
-    border: 1px solid var(--border-hi);
-    border-radius: 3px;
-    color: var(--fg-muted);
-    margin: 2px 2px 2px 0;
-  }
-  .about-cell-val .tag.blue   { border-color: rgba(122,162,247,0.4); color: var(--blue); }
-  .about-cell-val .tag.green  { border-color: rgba(158,206,106,0.4); color: var(--green); }
-  .about-cell-val .tag.amber  { border-color: rgba(224,175,104,0.4); color: var(--amber); }
-  .about-cell-val .tag.purple { border-color: rgba(187,154,247,0.4); color: var(--purple); }
-  .about-cell-val .tag.cyan   { border-color: rgba(125,207,255,0.4); color: var(--cyan); }
-  .about-cell-val .tag.red    { border-color: rgba(247,118,142,0.4); color: var(--red); }
-
-  /* ─── PROJECTS ─── */
-  .projects-grid {
-    display: grid;
-    gap: 1px;
-    background: var(--border);
+    padding: 1px 7px;
     border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
+    border-radius: 2px;
+    color: var(--dim);
   }
-  .project-card {
-    background: var(--bg-raised);
-    padding: 1.8rem 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    transition: background 0.12s;
-    position: relative;
-    overflow: hidden;
-  }
-  .project-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 2px;
-    background: transparent;
-    transition: background 0.15s;
-  }
-  .project-card:hover { background: var(--bg-sel); }
-  .project-card:hover::before { background: var(--blue); }
-
-  .project-id {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--fg-dim);
-    margin-bottom: 0.7rem;
-  }
-  .project-name {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--fg);
-    margin-bottom: 0.6rem;
-    letter-spacing: -0.01em;
-  }
-  .project-desc {
-    font-size: 12px;
-    color: var(--fg-muted);
-    line-height: 1.75;
-    margin-bottom: 1.2rem;
-    flex: 1;
-  }
-  .project-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .project-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-  .project-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    border: 1px solid var(--border-hi);
-    border-radius: 3px;
-    color: var(--fg-dim);
-  }
-  .project-link {
-    font-size: 11px;
+  .proj-link {
     color: var(--blue);
     text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    transition: color 0.12s;
-    white-space: nowrap;
-  }
-  .project-link:hover { color: var(--cyan); }
-  .project-link::after { content: ' →'; }
-
-  /* placeholder card */
-  .project-card.placeholder {
-    opacity: 0.4;
-    cursor: default;
-  }
-  .project-card.placeholder:hover { background: var(--bg-raised); }
-  .project-card.placeholder:hover::before { background: transparent; }
-  .project-card.placeholder .project-name { color: var(--fg-dim); }
-  .project-card.placeholder .placeholder-label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--fg-dim);
-    border: 1px dashed var(--border-hi);
-    border-radius: 3px;
-    padding: 2px 8px;
-    display: inline-block;
-  }
-
-  /* ─── CONTACT ─── */
-  .contact-block {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2rem;
-  }
-  .contact-row {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-    padding: 0.9rem 0;
-    border-bottom: 1px solid var(--border);
-    text-decoration: none;
-    transition: background 0.12s;
-    border-radius: 4px;
-    padding-left: 0.6rem;
-    margin: 0 -0.6rem;
-  }
-  .contact-row:last-child { border-bottom: none; }
-  .contact-row:hover { background: var(--bg-sel); }
-  .contact-service {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--fg-dim);
-    width: 90px;
-    flex-shrink: 0;
-  }
-  .contact-handle {
-    font-size: 13px;
-    color: var(--fg);
-  }
-  .contact-arrow {
-    margin-left: auto;
-    color: var(--fg-dim);
-    font-size: 12px;
-    transition: color 0.12s, transform 0.12s;
-  }
-  .contact-row:hover .contact-arrow { color: var(--blue); transform: translateX(3px); }
-
-  /* ─── FOOTER ─── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem;
-    text-align: center;
     font-size: 11px;
-    color: var(--fg-dim);
-    display: flex;
+    white-space: nowrap;
+    transition: color 0.1s;
+  }
+  .proj-link:hover { color: var(--fg); }
+  .proj-link::after { content: ' ↗'; }
+  .proj-null { color: var(--dim); font-size: 11px; }
+
+  /* ── CONTACT ── */
+  .contact-json {
+    font-size: 12px;
+    line-height: 2.1;
+    color: var(--muted);
+    max-width: 560px;
+  }
+  .j-brace  { color: var(--dim); }
+  .j-key    { color: var(--blue); }
+  .j-sep    { color: var(--dim); }
+  .j-val    { color: var(--green); }
+  .j-val a  {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(126,231,135,0.25);
+    transition: color 0.1s, border-color 0.1s;
+  }
+  .j-val a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+  .j-comma  { color: var(--dim); }
+
+  /* ── CURSOR ── */
+  .cursor {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--fg);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* ── MOBILE ── */
+  #mobile-wall {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 99999;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    padding: 2rem;
   }
-  footer .sep { color: var(--border-hi); }
-
-  /* ─── NOISE TEXTURE ─── */
-  .noise-overlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9998;
-    opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  /* ─── SCROLLBAR ACCENT ─── */
-  .gutter-accent {
-    position: fixed;
-    top: 44px; right: 0; bottom: 0;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--blue) 0%, transparent 100%);
-    opacity: 0.15;
-    pointer-events: none;
-    z-index: 50;
-  }
-
-  @media (max-width: 600px) {
-    .about-grid { grid-template-columns: 1fr; }
-    .about-cell:nth-child(3) { grid-column: span 1; }
-    nav { padding: 0 1rem; }
-    .nav-links { gap: 1rem; }
-    section { padding: 4rem 1.2rem; }
-  }
+  #mobile-wall .mw-icon { font-size: 18px; color: var(--dim); }
+  @media (max-width: 700px) { #mobile-wall { display: flex; } }
 </style>
 </head>
 <body>
 
-<div class="noise-overlay"></div>
-<div class="gutter-accent"></div>
+<!-- mobile wall -->
+<div id="mobile-wall">
+  <div class="mw-icon">[ ! ]</div>
+  <div>desktop only</div>
+  <div style="color:var(--dim);font-size:10px">scottx01.com</div>
+</div>
 
-<!-- NAV -->
-<nav>
-  <a class="nav-logo" href="#hero">
-    <span class="prompt">~/</span>scottx01<span class="cursor"></span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#about">about</a></li>
-    <li><a href="#projects">projects</a></li>
-    <li><a href="#contact">contact</a></li>
-  </ul>
-</nav>
+<!-- top bar -->
+<div id="topbar">
+  <div class="tb-session">
+    <span class="tb-u">scottx01</span><span class="tb-s">@</span><span class="tb-h">sx01</span><span class="tb-s">:</span><span class="tb-p">~</span>
+  </div>
+  <div class="tb-tabs">
+    <div class="tb-tab active" id="tab-home"     onclick="switchTab('home')">~</div>
+    <div class="tb-tab"       id="tab-about"    onclick="switchTab('about')">about</div>
+    <div class="tb-tab"       id="tab-projects" onclick="switchTab('projects')">projects</div>
+    <div class="tb-tab"       id="tab-contact"  onclick="switchTab('contact')">contact</div>
+  </div>
+  <div class="tb-right">
+    <span><span class="status-dot"></span>online</span>
+    <span id="clock">00:00</span>
+  </div>
+</div>
 
-<main>
+<!-- main -->
+<div id="main">
 
-  <!-- ═══════════════════ HERO ═══════════════════ -->
-  <section id="hero">
-    <div class="hero-eyebrow">
-      <span class="dot"></span>
-      <span>available for weird projects</span>
+  <!-- ── HOME ── -->
+  <div class="view active" id="view-home">
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat whoami</span>
+    </div>
+    <div class="output">
+      <div class="home-name">Scott<span class="acc">X01</span></div>
+      <div class="home-sub"><span class="handle">@scottx</span> &nbsp;//&nbsp; medford, or</div>
+      <div class="home-tags">linux tools &nbsp;·&nbsp; game mods &nbsp;·&nbsp; server admin &nbsp;·&nbsp; audio</div>
     </div>
 
-    <div class="hero-name">
-      Scott<span class="accent">X01</span>
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">ls links/</span>
     </div>
-    <div class="hero-handle">
-      <span>@scottx</span> &nbsp;//&nbsp; wherever that exists
-    </div>
-
-    <div class="hero-bio">
-      <span class="highlight">i make shit.</span><br>
-      tools, mods, music experiments, half-finished projects that somehow work.
-      if it lives in a terminal or a game engine, i'm probably interested.
-    </div>
-
-    <div class="hero-links">
-      <a class="hero-link" href="https://github.com/scottx01" target="_blank">
-        <span class="icon">⌥</span> github
-      </a>
-      <a class="hero-link" href="https://discordapp.com/users/scottyx1" target="_blank">
-        <span class="icon">#</span> discord
-      </a>
-      <a class="hero-link" href="https://www.protondb.com/users/568192010" target="_blank">
-        <span class="icon">⬡</span> protondb
-      </a>
-      <a class="hero-link" href="https://www.instagram.com/scott.rtf" target="_blank">
-        <span class="icon">◈</span> instagram
-      </a>
-    </div>
-  </section>
-
-  <!-- ═══════════════════ ABOUT ═══════════════════ -->
-  <section id="about">
-    <div class="section-label">about</div>
-
-    <div class="about-grid">
-      <div class="about-cell">
-        <div class="about-cell-label">// handle</div>
-        <div class="about-cell-val">ScottX01 &nbsp;<span style="color:var(--fg-dim)">/ ScottX</span></div>
-      </div>
-      <div class="about-cell">
-        <div class="about-cell-label">// location</div>
-        <div class="about-cell-val">Medford, OR</div>
-      </div>
-      <div class="about-cell" style="grid-column: span 2">
-        <div class="about-cell-label">// interests</div>
-        <div class="about-cell-val" style="margin-top:4px">
-          <span class="tag blue">linux / proton</span>
-          <span class="tag green">project zomboid</span>
-          <span class="tag purple">jrpgs</span>
-          <span class="tag amber">music production</span>
-          <span class="tag cyan">game modding</span>
-          <span class="tag red">server admin</span>
-        </div>
-      </div>
-      <div class="about-cell" style="grid-column: span 2">
-        <div class="about-cell-label">// what i actually do</div>
-        <div class="about-cell-val" style="color:var(--fg-muted); font-size:12px; max-width:560px;">
-          Mostly build tools that scratch my own itch — stuff that makes gaming on Linux less of a hassle,
-          server utilities, random scripts. I tinker more than I ship but eventually things
-          become real. Also deep into music production and <span style="color:var(--fg)">making weird sounds</span> with AI tools.
-        </div>
+    <div class="output">
+      <div class="links-list">
+        <a class="term-link" href="https://github.com/scottx01" target="_blank">⌥&nbsp; github</a>
+        <a class="term-link" href="https://discordapp.com/users/scottyx1" target="_blank">#&nbsp; discord</a>
+        <a class="term-link" href="https://www.protondb.com/users/568192010" target="_blank">⬡&nbsp; protondb</a>
+        <a class="term-link" href="https://www.instagram.com/scott.rtf" target="_blank">◈&nbsp; instagram</a>
       </div>
     </div>
-  </section>
 
-  <!-- ═══════════════════ PROJECTS ═══════════════════ -->
-  <section id="projects">
-    <div class="section-label">projects</div>
-
-    <div class="projects-grid">
-
-      <!-- REAL PROJECT -->
-      <div class="project-card">
-        <div class="project-id">proj_001 &nbsp;//&nbsp; tool</div>
-        <div class="project-name">ProtonDB Report Maker</div>
-        <div class="project-desc">
-          A browser-based form for generating well-formatted ProtonDB compatibility reports.
-          Handles the summary field (with 140-char limit tracking) and markdown-formatted
-          concluding notes — no more manually writing the same boilerplate every time.
-          Includes quick presets per rating category, a live preview with syntax highlighting,
-          and a GE-Proton version lookup snippet.
-        </div>
-        <div class="project-footer">
-          <div class="project-tags">
-            <span class="project-tag">html</span>
-            <span class="project-tag">vanilla js</span>
-            <span class="project-tag">linux</span>
-          </div>
-          <a class="project-link" href="/protondb" target="_blank">view project</a>
-        </div>
-      </div>
-
-      <!-- PLACEHOLDER 2 -->
-      <div class="project-card placeholder">
-        <div class="project-id">proj_002 &nbsp;//&nbsp; <span class="placeholder-label">wip</span></div>
-        <div class="project-name">something in progress</div>
-        <div class="project-desc" style="color:var(--fg-dim)">
-          currently in the "this might actually work" phase.
-        </div>
-      </div>
-
-      <!-- PLACEHOLDER 3 -->
-      <div class="project-card placeholder">
-        <div class="project-id">proj_003 &nbsp;//&nbsp; <span class="placeholder-label">unreleased</span></div>
-        <div class="project-name">tbd</div>
-        <div class="project-desc" style="color:var(--fg-dim)">
-          check back later.
-        </div>
-      </div>
-
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="cursor"></span>
     </div>
-  </section>
+  </div>
 
-  <!-- ═══════════════════ CONTACT ═══════════════════ -->
-  <section id="contact">
-    <div class="section-label">contact</div>
-
-    <div class="contact-block">
-      <a class="contact-row" href="https://github.com/scottx01" target="_blank">
-        <span class="contact-service">github</span>
-        <span class="contact-handle">github.com/scottx01</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a class="contact-row" href="https://discordapp.com/users/scottyx1" target="_blank">
-        <span class="contact-service">discord</span>
-        <span class="contact-handle">scottyx1</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a class="contact-row" href="https://www.protondb.com/users/568192010" target="_blank">
-        <span class="contact-service">protondb</span>
-        <span class="contact-handle">protondb.com/users/568192010</span>
-        <span class="contact-arrow">→</span>
-      </a>
-      <a class="contact-row" href="https://www.instagram.com/scott.rtf" target="_blank">
-        <span class="contact-service">instagram</span>
-        <span class="contact-handle">@scott.rtf</span>
-        <span class="contact-arrow">→</span>
-      </a>
+  <!-- ── ABOUT ── -->
+  <div class="view" id="view-about">
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat about.md</span>
     </div>
-  </section>
+    <div class="output">
+      <table class="kv-table">
+        <tr>
+          <td class="kv-key">handle</td>
+          <td class="kv-val">ScottX01 <span style="color:var(--dim)">/ ScottX</span></td>
+        </tr>
+        <tr>
+          <td class="kv-key">location</td>
+          <td class="kv-val">Medford, OR</td>
+        </tr>
+        <tr>
+          <td class="kv-key">interests</td>
+          <td class="kv-val">
+            <span class="tag b">linux / proton</span>
+            <span class="tag g">project zomboid</span>
+            <span class="tag p">jrpgs</span>
+            <span class="tag a">music production</span>
+            <span class="tag b">game modding</span>
+            <span class="tag r">server admin</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="kv-key">desc</td>
+          <td class="kv-val" style="color:var(--muted)">
+            Builds tools for Linux gaming, server management, and game modding.
+            Scripts, utilities, patches — whatever's needed. Also into music production
+            and <span style="color:var(--fg)">audio experimentation</span> with AI tooling.
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="cursor"></span>
+    </div>
+  </div>
 
-</main>
+  <!-- ── PROJECTS ── -->
+  <div class="view" id="view-projects">
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">ls -la projects/</span>
+    </div>
+    <div class="output">
+      <table class="proj-table">
+        <thead>
+          <tr>
+            <th style="width:70px">id</th>
+            <th>name / desc</th>
+            <th style="width:180px">stack</th>
+            <th style="width:60px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="proj-id">proj_001</td>
+            <td>
+              <div class="proj-name">ProtonDB Report Maker</div>
+              <div class="proj-desc">Browser tool for generating formatted ProtonDB compatibility reports. 140-char summary tracking, markdown notes, rating presets, live preview, GE-Proton version lookup.</div>
+            </td>
+            <td>
+              <div class="proj-stack">
+                <span>html</span>
+                <span>vanilla js</span>
+                <span>linux</span>
+              </div>
+            </td>
+            <td><a class="proj-link" href="/protondb" target="_blank">open</a></td>
+          </tr>
+          <tr>
+            <td class="proj-id">proj_002</td>
+            <td>
+              <div class="proj-name" style="color:var(--dim)">wip</div>
+              <div class="proj-desc">in progress. no eta.</div>
+            </td>
+            <td></td>
+            <td><span class="proj-null">—</span></td>
+          </tr>
+          <tr>
+            <td class="proj-id">proj_003</td>
+            <td>
+              <div class="proj-name" style="color:var(--dim)">tbd</div>
+              <div class="proj-desc">pending.</div>
+            </td>
+            <td></td>
+            <td><span class="proj-null">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="cursor"></span>
+    </div>
+  </div>
 
-<footer>
-  <span>ScottX01</span>
-  <span class="sep">//</span>
-  <span>made something real</span>
-</footer>
+  <!-- ── CONTACT ── -->
+  <div class="view" id="view-contact">
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat contact.json</span>
+    </div>
+    <div class="output">
+      <div class="contact-json">
+        <span class="j-brace">{</span><br>
+        &nbsp;&nbsp;<span class="j-key">"github"</span><span class="j-sep">:&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="j-val">"<a href="https://github.com/scottx01" target="_blank">github.com/scottx01</a>"</span><span class="j-comma">,</span><br>
+        &nbsp;&nbsp;<span class="j-key">"discord"</span><span class="j-sep">:&nbsp;&nbsp;&nbsp;</span><span class="j-val">"<a href="https://discordapp.com/users/scottyx1" target="_blank">scottyx1</a>"</span><span class="j-comma">,</span><br>
+        &nbsp;&nbsp;<span class="j-key">"protondb"</span><span class="j-sep">:&nbsp;&nbsp;</span><span class="j-val">"<a href="https://www.protondb.com/users/568192010" target="_blank">protondb.com/users/568192010</a>"</span><span class="j-comma">,</span><br>
+        &nbsp;&nbsp;<span class="j-key">"instagram"</span><span class="j-sep">:&nbsp;</span><span class="j-val">"<a href="https://www.instagram.com/scott.rtf" target="_blank">@scott.rtf</a>"</span><br>
+        <span class="j-brace">}</span>
+      </div>
+    </div>
+    <div class="prompt">
+      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="cursor"></span>
+    </div>
+  </div>
 
+</div><!-- /#main -->
+
+<!-- bottom bar -->
+<div id="bottombar">
+  <span>scottx01.com</span>
+  <span class="bb-sep">│</span>
+  <span>v1.0</span>
+  <div class="bb-right">
+    <span style="color:var(--green)">●</span>&nbsp;medford, or
+    <span class="bb-sep">│</span>
+    <span id="uptime">up 0s</span>
+  </div>
+</div>
+
+<script>
+  /* ── TABS ── */
+  function switchTab(name) {
+    document.querySelectorAll('.tb-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('view-' + name).classList.add('active');
+    document.getElementById('main').scrollTop = 0;
+  }
+
+  /* ── CLOCK ── */
+  function updateClock() {
+    var now = new Date();
+    var h = String(now.getHours()).padStart(2, '0');
+    var m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('clock').textContent = h + ':' + m;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* ── UPTIME ── */
+  var startTime = Date.now();
+  function updateUptime() {
+    var s = Math.floor((Date.now() - startTime) / 1000);
+    var d = Math.floor(s / 86400); s %= 86400;
+    var h = Math.floor(s / 3600);  s %= 3600;
+    var m = Math.floor(s / 60);    s %= 60;
+    var str = 'up ';
+    if (d) str += d + 'd ';
+    if (h) str += h + 'h ';
+    if (m) str += m + 'm ';
+    str += s + 's';
+    document.getElementById('uptime').textContent = str;
+  }
+  updateUptime();
+  setInterval(updateUptime, 1000);
+</script>
 </body>
 </html>
