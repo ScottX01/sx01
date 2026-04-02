@@ -350,32 +350,51 @@
   }
 
   /* ── MOBILE ── */
-  #mobile-wall {
-    display: none;
-    position: fixed; inset: 0;
-    background: var(--bg);
-    z-index: 99999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 12px;
-    color: var(--muted);
-    text-align: center;
-    padding: 2rem;
+  @media (max-width: 700px) {
+    html, body {
+      height: auto;
+      overflow-y: auto;
+    }
+
+    .tb-session { display: none; }
+    .tb-right { display: none; }
+    .tb-tab { padding: 0 14px; font-size: 10px; }
+
+    #main {
+      position: static;
+      margin-top: 30px;
+      padding: 20px 16px 32px;
+      overflow-y: visible;
+    }
+
+    #bottombar {
+      position: static;
+    }
+
+    /* about: stack key above value */
+    .kv-table { display: block; }
+    .kv-table tbody { display: block; }
+    .kv-table tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .kv-table tr:last-child { border-bottom: none; }
+    .kv-key { display: block; width: auto; padding: 0 0 4px 0; white-space: normal; }
+    .kv-val { display: block; padding: 0; }
+
+    /* projects: hide table header, stack cells as cards */
+    .proj-table { display: block; }
+    .proj-table thead { display: none; }
+    .proj-table tbody { display: block; }
+    .proj-table tbody tr { display: block; padding: 14px 0; }
+    .proj-table td { display: block; padding: 2px 0; }
+    .proj-desc { max-width: 100%; }
+    .proj-stack { margin-top: 6px; }
+    .proj-link { display: inline-block; margin-top: 6px; }
+
+    /* contact: tighten up */
+    .contact-json { font-size: 11px; }
   }
-  #mobile-wall .mw-icon { font-size: 18px; color: var(--dim); }
-  @media (max-width: 700px) { #mobile-wall { display: flex; } }
 </style>
 </head>
 <body>
-
-<!-- mobile wall -->
-<div id="mobile-wall">
-  <div class="mw-icon">[ ! ]</div>
-  <div>desktop only</div>
-  <div style="color:var(--dim);font-size:10px">scottx01.com</div>
-</div>
 
 <!-- top bar -->
 <div id="topbar">
