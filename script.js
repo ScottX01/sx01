@@ -1,7 +1,8 @@
 function updateClock() {
+  var el = document.getElementById('clock');
+  if (!el) return;
   var now = new Date();
-  document.getElementById('clock').textContent =
-    String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  el.textContent = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
 }
 updateClock();
 setInterval(updateClock, 1000);
