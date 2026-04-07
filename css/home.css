@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── Log feed wrapper ───────────────────────────────────────────────────────── */
+
+.log-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Prompt header ──────────────────────────────────────────────────────────── */
+
+.log-prompt {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 0;
+}
+
+.lp-host { color: var(--green); }
+.lp-sep  { color: var(--fg-dim); }
+.lp-cmd  { color: var(--fg); margin-left: 5px; }
+
+.lp-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--blue);
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: blink 1s step-end infinite; /* reuses keyframe from styles.css */
+}
+
+/* ── Status lines ───────────────────────────────────────────────────────────── */
+
+.log-status {
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+
+.log-status.is-error {
+  color: var(--red);
+}
+
+/* ── Log rows ───────────────────────────────────────────────────────────────── */
+
+#log-feed {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 100px 72px 1fr;
+  align-items: baseline;
+  column-gap: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg3);
+}
+
+.log-row:last-child {
+  border-bottom: none;
+}
+
+.log-date {
+  font-size: 12px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+
+/* ── Type badges ────────────────────────────────────────────────────────────── */
+
+.log-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.badge-commit { background: #80a0ff20; border-color: #80a0ff40; color: var(--blue); }
+.badge-repo   { background: #cf87e820; border-color: #cf87e840; color: var(--magenta); }
+.badge-ship   { background: #79dac820; border-color: #79dac840; color: var(--cyan); }
+.badge-wip    { background: #e3c78a20; border-color: #e3c78a40; color: var(--yellow); }
+.badge-note   { background: #61616120; border-color: #61616140; color: var(--fg-dim); }
+
+/* ── Log text ───────────────────────────────────────────────────────────────── */
+
+.log-text {
+  font-size: 13px;
+  color: var(--fg);
+  line-height: 1.5;
+}
+
+.log-link {
+  color: var(--blue);
+  text-decoration: none;
+}
+.log-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Mobile ─────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .log-row {
+    grid-template-columns: 86px 64px 1fr;
+    column-gap: 8px;
+    font-size: 12px;
+  }
+  .log-text  { font-size: 12px; }
+  .log-badge { font-size: 10px; padding: 1px 7px; }
+}

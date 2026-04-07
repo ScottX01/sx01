@@ -4,7 +4,8 @@
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/home.css">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>scottx01</title>
@@ -30,29 +31,13 @@
 <div id="main">
 
   <div class="view active" id="view-home">
-    <div class="prompt">
-      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat whoami</span>
-    </div>
-    <div class="output">
-      <div class="home-name">Scott<span class="acc">X01</span></div>
-      <div class="home-sub"><span class="handle">@scottx</span> &nbsp;//&nbsp; medford, or</div>
-      <div class="home-tags">linux tools &nbsp;·&nbsp; game mods &nbsp;·&nbsp; server admin &nbsp;·&nbsp; audio</div>
-    </div>
-
-    <div class="prompt">
-      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">ls links/</span>
-    </div>
-    <div class="output">
-      <div class="links-list">
-        <a class="term-link" href="https://github.com/scottx01" target="_blank">⌥&nbsp; github</a>
-        <a class="term-link" href="https://discordapp.com/users/scottyx1" target="_blank">#&nbsp; discord</a>
-        <a class="term-link" href="https://www.protondb.com/users/568192010" target="_blank">⬡&nbsp; protondb</a>
-        <a class="term-link" href="https://www.instagram.com/scott.rtf" target="_blank">◈&nbsp; instagram</a>
+    <div class="log-wrap">
+      <div class="log-prompt">
+        <span class="lp-host">sx01</span><span class="lp-sep">:~$</span><span class="lp-cmd">cat log.json</span><span class="lp-cursor"></span>
       </div>
-    </div>
-
-    <div class="prompt">
-      <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="cursor"></span>
+      <div id="log-feed">
+        <span class="log-status">// loading...</span>
+      </div>
     </div>
   </div>
 
@@ -64,11 +49,11 @@
       <table class="kv-table">
         <tr>
           <td class="kv-key">handle</td>
-          <td class="kv-val">ScottX01 <span style="color:var(--dim)">/ ScottX</span></td>
+          <td class="kv-val">ScottX01</td>
         </tr>
         <tr>
           <td class="kv-key">location</td>
-          <td class="kv-val">Medford, OR</td>
+          <td class="kv-val">PNW, USA</td>
         </tr>
         <tr>
           <td class="kv-key">interests</td>
@@ -124,31 +109,22 @@
                 <span>linux</span>
               </div>
             </td>
-            <td><a class="proj-link" href="/protondb" target="_blank">open</a></td>
+            <td><a class="proj-link" href="/protondb">open</a></td>
           </tr>
           <tr>
-  <td class="proj-id">proj_002</td>
-  <td>
-    <div class="proj-name">WT Russia Ground Tracker</div>
-    <div class="proj-desc">War Thunder Russia ground tree progress tracker. Toggle vehicles owned, track RP and SL spent per rank.</div>
-  </td>
-  <td>
-    <div class="proj-stack">
-      <span>html</span>
-      <span>vanilla js</span>
-      <span>war thunder</span>
-    </div>
-  </td>
-  <td><a class="proj-link" href="/wt/russia/ground" target="_blank">open</a></td>
-</tr>
-          <tr>
-            <td class="proj-id">proj_003</td>
+            <td class="proj-id">proj_002</td>
             <td>
-              <div class="proj-name" style="color:var(--dim)">tbd</div>
-              <div class="proj-desc">pending.</div>
+              <div class="proj-name">FIRS 5 Steeltown Reference</div>
+              <div class="proj-desc">Interactive cargo flow reference for the Steeltown economy in OpenTTD FIRS 5. Searchable industry list, cargo inputs/outputs, and live cross-reference showing which industries produce or accept any given cargo.</div>
             </td>
-            <td></td>
-            <td><span class="proj-null">—</span></td>
+            <td>
+              <div class="proj-stack">
+                <span>html</span>
+                <span>vanilla js</span>
+                <span>openttd</span>
+              </div>
+            </td>
+            <td><a class="proj-link" href="/openttd">open</a></td>
           </tr>
         </tbody>
       </table>
@@ -182,11 +158,9 @@
 <div id="bottombar">
   <span>scottx01.com</span>
   <span class="bb-sep">│</span>
-  <span>v1.0</span>
+  <span>home</span>
   <div class="bb-right">
-    <span style="color:var(--green)">●</span>&nbsp;medford, or
-    <span class="bb-sep">│</span>
-    <span id="uptime">up 0s</span>
+    <span>&copy; 2026</span>
   </div>
 </div>
 
@@ -208,21 +182,101 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  var startTime = Date.now();
-  function updateUptime() {
-    var s = Math.floor((Date.now() - startTime) / 1000);
-    var d = Math.floor(s / 86400); s %= 86400;
-    var h = Math.floor(s / 3600);  s %= 3600;
-    var m = Math.floor(s / 60);    s %= 60;
-    var str = 'up ';
-    if (d) str += d + 'd ';
-    if (h) str += h + 'h ';
-    if (m) str += m + 'm ';
-    str += s + 's';
-    document.getElementById('uptime').textContent = str;
+  (function() {
+    var tab = new URLSearchParams(window.location.search).get('tab');
+    if (tab && document.getElementById('tab-' + tab)) switchTab(tab);
+  })();
+
+</script>
+<script>
+// ── Log feed ─────────────────────────────────────────────────────────────────
+
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function loadLog() {
+  var feed = document.getElementById('log-feed');
+
+  var results = await Promise.allSettled([
+    fetch('./log.json').then(function(r) {
+      if (!r.ok) throw new Error('log.json ' + r.status);
+      return r.json();
+    }),
+    fetch('https://api.github.com/users/ScottX01/events/public').then(function(r) {
+      return r.json();
+    })
+  ]);
+
+  var localResult  = results[0];
+  var githubResult = results[1];
+  var entries      = [];
+  var localError   = localResult.status === 'rejected';
+
+  // ── Local entries ────────────────────────────────────
+  if (!localError && localResult.value && Array.isArray(localResult.value.log)) {
+    localResult.value.log.forEach(function(e) {
+      if (e.date && e.text && e.type) {
+        entries.push({ date: e.date, type: e.type, html: escHtml(e.text) });
+      }
+    });
   }
-  updateUptime();
-  setInterval(updateUptime, 1000);
+
+  // ── GitHub entries ───────────────────────────────────
+  if (githubResult.status === 'fulfilled' && Array.isArray(githubResult.value)) {
+    githubResult.value.forEach(function(ev) {
+      var date = ev.created_at ? ev.created_at.slice(0, 10) : null;
+      if (!date || !ev.repo) return;
+
+      var repoFull = ev.repo.name;
+      var repoName = repoFull.split('/')[1] || repoFull;
+      var repoLink = '<a class="log-link" href="https://github.com/' + escHtml(repoFull) + '" target="_blank">' + escHtml(repoName) + '</a>';
+
+      if (ev.type === 'PushEvent') {
+        var n = (ev.payload && ev.payload.commits) ? ev.payload.commits.length : 1;
+        entries.push({ date: date, type: 'commit', html: 'pushed ' + n + ' commit' + (n !== 1 ? 's' : '') + ' to ' + repoLink });
+
+      } else if (ev.type === 'CreateEvent' && ev.payload && ev.payload.ref_type === 'repository') {
+        entries.push({ date: date, type: 'repo', html: 'created repo ' + repoLink });
+
+      } else if (ev.type === 'ReleaseEvent' && ev.payload && ev.payload.release) {
+        var tag = escHtml(ev.payload.release.tag_name || '?');
+        entries.push({ date: date, type: 'ship', html: 'released ' + tag + ' on ' + repoLink });
+      }
+    });
+  }
+
+  // ── Sort, dedupe consecutive pushes to same repo on same day, slice ──────
+  entries.sort(function(a, b) {
+    return b.date < a.date ? -1 : b.date > a.date ? 1 : 0;
+  });
+  entries = entries.slice(0, 12);
+
+  // ── Render ───────────────────────────────────────────
+  if (entries.length === 0) {
+    if (localError) {
+      feed.innerHTML = '<span class="log-status is-error">// could not load log.json</span>';
+    } else {
+      feed.innerHTML = '<span class="log-status">// no entries found</span>';
+    }
+    return;
+  }
+
+  feed.innerHTML = entries.map(function(e) {
+    return [
+      '<div class="log-row">',
+      '<span class="log-date">', escHtml(e.date), '</span>',
+      '<span class="log-badge badge-', escHtml(e.type), '">', escHtml(e.type), '</span>',
+      '<span class="log-text">', e.html, '</span>',
+      '</div>'
+    ].join('');
+  }).join('');
+}
+
+loadLog();
 </script>
 </body>
 </html>
