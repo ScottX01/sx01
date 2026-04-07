@@ -121,7 +121,9 @@ async function loadLog() {
   }).join('');
 }
 
-loadLog();
+document.addEventListener('DOMContentLoaded', function() {
+  loadLog();
+});
 
 var PRESETS = {
   perfect: [
