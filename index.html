@@ -4,399 +4,13 @@
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="stylesheet" href="/styles.css">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>scottx01</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
-  :root {
-    --bg:     #0d1117;
-    --bg2:    #010409;
-    --bg3:    #161b22;
-    --border: #21262d;
-    --fg:     #c9d1d9;
-    --muted:  #6e7681;
-    --dim:    #3d444d;
-    --green:  #7ee787;
-    --blue:   #79c0ff;
-    --purple: #d2a8ff;
-    --amber:  #e3b341;
-    --red:    #ff7b72;
-    --cyan:   #56d364;
-    --font: 'JetBrains Mono', 'Cascadia Code', 'Fira Mono', monospace;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-    background: var(--bg2);
-    color: var(--fg);
-    font-family: var(--font);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-
-  /* scanline */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent, transparent 2px,
-      rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  * { scrollbar-color: var(--border) var(--bg); scrollbar-width: thin; }
-
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-
-  /* ── TOP BAR ── */
-  #topbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 30px;
-    background: var(--bg3);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: stretch;
-    z-index: 100;
-    user-select: none;
-  }
-  .tb-session {
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    gap: 0;
-    font-size: 11px;
-    border-right: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .tb-u { color: var(--green); }
-  .tb-s { color: var(--dim); }
-  .tb-h { color: var(--blue); }
-  .tb-p { color: var(--purple); }
-  .tb-tabs {
-    display: flex;
-    align-items: stretch;
-    flex: 1;
-  }
-  .tb-tab {
-    font-size: 11px;
-    padding: 0 18px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    color: var(--muted);
-    border-right: 1px solid transparent;
-    letter-spacing: 0.04em;
-    transition: color 0.1s, background 0.1s;
-    position: relative;
-  }
-  .tb-tab:hover { color: var(--fg); background: rgba(255,255,255,0.03); }
-  .tb-tab.active {
-    color: var(--fg);
-    background: var(--bg);
-    border-right-color: var(--border);
-    border-left-color: var(--border);
-  }
-  .tb-tab.active::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--green);
-  }
-  .tb-tab:first-child.active { border-left-color: transparent; }
-  .tb-right {
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    gap: 18px;
-    font-size: 11px;
-    color: var(--muted);
-    margin-left: auto;
-    border-left: 1px solid var(--border);
-  }
-  .status-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2.5s ease-in-out infinite;
-    vertical-align: middle;
-    margin-right: 4px;
-  }
-
-  /* ── MAIN CONTENT ── */
-  #main {
-    position: fixed;
-    top: 30px; left: 0; right: 0; bottom: 22px;
-    overflow-y: auto;
-    background: var(--bg);
-    padding: 36px 52px 52px;
-  }
-
-  /* ── BOTTOM BAR ── */
-  #bottombar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 22px;
-    background: var(--bg3);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    font-size: 10px;
-    color: var(--dim);
-    z-index: 100;
-    user-select: none;
-    gap: 0;
-  }
-  .bb-sep { margin: 0 12px; color: var(--border); }
-  .bb-right { margin-left: auto; display: flex; align-items: center; gap: 0; }
-
-  /* ── VIEWS ── */
-  .view { display: none; }
-  .view.active { display: block; }
-
-  /* ── PROMPT LINE ── */
-  .prompt {
-    display: flex;
-    align-items: center;
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-  .pr-u { color: var(--green); }
-  .pr-s { color: var(--dim); }
-  .pr-h { color: var(--blue); }
-  .pr-p { color: var(--purple); }
-  .pr-d { color: var(--muted); white-space: pre; }
-  .pr-c { color: var(--fg); }
-
-  .output {
-    margin-bottom: 32px;
-    padding-left: 0;
-  }
-
-  /* ── HOME ── */
-  .home-name {
-    font-size: clamp(32px, 5.5vw, 58px);
-    font-weight: 700;
-    color: var(--fg);
-    letter-spacing: -0.025em;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .home-name .acc { color: var(--blue); }
-  .home-sub {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-    margin-bottom: 10px;
-  }
-  .home-sub .handle { color: var(--purple); }
-  .home-tags {
-    font-size: 12px;
-    color: var(--dim);
-    letter-spacing: 0.02em;
-  }
-
-  .links-list {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .term-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 14px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    transition: border-color 0.12s, color 0.12s, background 0.12s;
-  }
-  .term-link:hover {
-    border-color: var(--blue);
-    color: var(--blue);
-    background: rgba(121,192,255,0.05);
-  }
-
-  /* ── ABOUT ── */
-  .kv-table {
-    width: 100%;
-    border-collapse: collapse;
-    max-width: 680px;
-  }
-  .kv-table tr { border-bottom: 1px solid var(--border); }
-  .kv-table tr:last-child { border-bottom: none; }
-  .kv-key {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--dim);
-    padding: 12px 28px 12px 0;
-    vertical-align: top;
-    white-space: nowrap;
-    width: 110px;
-  }
-  .kv-val {
-    font-size: 12px;
-    color: var(--fg);
-    padding: 12px 0;
-    line-height: 1.75;
-  }
-  .tag {
-    display: inline-block;
-    font-size: 10px;
-    padding: 1px 8px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    color: var(--muted);
-    margin: 2px 3px 2px 0;
-  }
-  .tag.b { border-color: rgba(121,192,255,0.3); color: var(--blue); }
-  .tag.g { border-color: rgba(126,231,135,0.3); color: var(--green); }
-  .tag.p { border-color: rgba(210,168,255,0.3); color: var(--purple); }
-  .tag.a { border-color: rgba(227,179,65,0.3);  color: var(--amber); }
-  .tag.r { border-color: rgba(255,123,114,0.3); color: var(--red); }
-
-  /* ── PROJECTS ── */
-  .proj-table {
-    width: 100%;
-    border-collapse: collapse;
-    max-width: 820px;
-  }
-  .proj-table thead tr { border-bottom: 1px solid var(--border); }
-  .proj-table th {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--dim);
-    padding: 0 24px 10px 0;
-    text-align: left;
-    font-weight: 400;
-  }
-  .proj-table tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  .proj-table tbody tr:last-child { border-bottom: none; }
-  .proj-table tbody tr:hover { background: rgba(255,255,255,0.02); }
-  .proj-table td { padding: 16px 24px 16px 0; vertical-align: top; }
-  .proj-id { font-size: 10px; color: var(--dim); white-space: nowrap; }
-  .proj-name { font-size: 13px; color: var(--fg); font-weight: 600; margin-bottom: 4px; }
-  .proj-desc { font-size: 11px; color: var(--muted); line-height: 1.65; max-width: 460px; }
-  .proj-stack { display: flex; gap: 5px; flex-wrap: wrap; }
-  .proj-stack span {
-    font-size: 10px;
-    padding: 1px 7px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    color: var(--dim);
-  }
-  .proj-link {
-    color: var(--blue);
-    text-decoration: none;
-    font-size: 11px;
-    white-space: nowrap;
-    transition: color 0.1s;
-  }
-  .proj-link:hover { color: var(--fg); }
-  .proj-link::after { content: ' ↗'; }
-  .proj-null { color: var(--dim); font-size: 11px; }
-
-  /* ── CONTACT ── */
-  .contact-json {
-    font-size: 12px;
-    line-height: 2.1;
-    color: var(--muted);
-    max-width: 560px;
-  }
-  .j-brace  { color: var(--dim); }
-  .j-key    { color: var(--blue); }
-  .j-sep    { color: var(--dim); }
-  .j-val    { color: var(--green); }
-  .j-val a  {
-    color: inherit;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(126,231,135,0.25);
-    transition: color 0.1s, border-color 0.1s;
-  }
-  .j-val a:hover { color: var(--fg); border-bottom-color: var(--fg); }
-  .j-comma  { color: var(--dim); }
-
-  /* ── CURSOR ── */
-  .cursor {
-    display: inline-block;
-    width: 7px; height: 13px;
-    background: var(--fg);
-    vertical-align: middle;
-    animation: blink 1s step-end infinite;
-  }
-
-  /* ── MOBILE ── */
-  @media (max-width: 700px) {
-    html, body {
-      height: auto;
-      overflow-y: auto;
-    }
-
-    .tb-session { display: none; }
-    .tb-right { display: none; }
-    .tb-tab { padding: 0 14px; font-size: 10px; }
-
-    #main {
-      position: static;
-      margin-top: 30px;
-      padding: 20px 16px 32px;
-      overflow-y: visible;
-    }
-
-    #bottombar {
-      position: static;
-    }
-
-    /* about: stack key above value */
-    .kv-table { display: block; }
-    .kv-table tbody { display: block; }
-    .kv-table tr { display: block; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .kv-table tr:last-child { border-bottom: none; }
-    .kv-key { display: block; width: auto; padding: 0 0 4px 0; white-space: normal; }
-    .kv-val { display: block; padding: 0; }
-
-    /* projects: hide table header, stack cells as cards */
-    .proj-table { display: block; }
-    .proj-table thead { display: none; }
-    .proj-table tbody { display: block; }
-    .proj-table tbody tr { display: block; padding: 14px 0; }
-    .proj-table td { display: block; padding: 2px 0; }
-    .proj-desc { max-width: 100%; }
-    .proj-stack { margin-top: 6px; }
-    .proj-link { display: inline-block; margin-top: 6px; }
-
-    /* contact: tighten up */
-    .contact-json { font-size: 11px; }
-  }
-</style>
 </head>
 <body>
 
-<!-- top bar -->
 <div id="topbar">
   <div class="tb-session">
     <span class="tb-u">scottx01</span><span class="tb-s">@</span><span class="tb-h">sx01</span><span class="tb-s">:</span><span class="tb-p">~</span>
@@ -413,10 +27,8 @@
   </div>
 </div>
 
-<!-- main -->
 <div id="main">
 
-  <!-- ── HOME ── -->
   <div class="view active" id="view-home">
     <div class="prompt">
       <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat whoami</span>
@@ -444,7 +56,6 @@
     </div>
   </div>
 
-  <!-- ── ABOUT ── -->
   <div class="view" id="view-about">
     <div class="prompt">
       <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat about.md</span>
@@ -485,7 +96,6 @@
     </div>
   </div>
 
-  <!-- ── PROJECTS ── -->
   <div class="view" id="view-projects">
     <div class="prompt">
       <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">ls -la projects/</span>
@@ -517,14 +127,20 @@
             <td><a class="proj-link" href="/protondb" target="_blank">open</a></td>
           </tr>
           <tr>
-            <td class="proj-id">proj_002</td>
-            <td>
-              <div class="proj-name" style="color:var(--dim)">wip</div>
-              <div class="proj-desc">in progress. no eta.</div>
-            </td>
-            <td></td>
-            <td><span class="proj-null">—</span></td>
-          </tr>
+  <td class="proj-id">proj_002</td>
+  <td>
+    <div class="proj-name">WT Russia Ground Tracker</div>
+    <div class="proj-desc">War Thunder Russia ground tree progress tracker. Toggle vehicles owned, track RP and SL spent per rank.</div>
+  </td>
+  <td>
+    <div class="proj-stack">
+      <span>html</span>
+      <span>vanilla js</span>
+      <span>war thunder</span>
+    </div>
+  </td>
+  <td><a class="proj-link" href="/wt/russia/ground" target="_blank">open</a></td>
+</tr>
           <tr>
             <td class="proj-id">proj_003</td>
             <td>
@@ -542,7 +158,6 @@
     </div>
   </div>
 
-  <!-- ── CONTACT ── -->
   <div class="view" id="view-contact">
     <div class="prompt">
       <span class="pr-u">scottx01</span><span class="pr-s">@</span><span class="pr-h">sx01</span><span class="pr-s">:</span><span class="pr-p">~</span><span class="pr-d"> $ </span><span class="pr-c">cat contact.json</span>
@@ -562,9 +177,8 @@
     </div>
   </div>
 
-</div><!-- /#main -->
+</div>
 
-<!-- bottom bar -->
 <div id="bottombar">
   <span>scottx01.com</span>
   <span class="bb-sep">│</span>
@@ -577,7 +191,6 @@
 </div>
 
 <script>
-  /* ── TABS ── */
   function switchTab(name) {
     document.querySelectorAll('.tb-tab').forEach(function(t) { t.classList.remove('active'); });
     document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
@@ -586,7 +199,6 @@
     document.getElementById('main').scrollTop = 0;
   }
 
-  /* ── CLOCK ── */
   function updateClock() {
     var now = new Date();
     var h = String(now.getHours()).padStart(2, '0');
@@ -596,7 +208,6 @@
   updateClock();
   setInterval(updateClock, 1000);
 
-  /* ── UPTIME ── */
   var startTime = Date.now();
   function updateUptime() {
     var s = Math.floor((Date.now() - startTime) / 1000);
