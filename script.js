@@ -72,12 +72,19 @@ async function loadLog() {
       } else if (ev.type === 'ReleaseEvent' && ev.payload && ev.payload.release) {
         var tag = escHtml(ev.payload.release.tag_name || '?');
         entries.push({ date: date, type: 'ship', html: 'released ' + tag + ' on ' + repoLink });
+
+      } else if (ev.type === 'CommitCommentEvent' && ev.payload && ev.payload.comment) {
+        var body = ev.payload.comment.body || '';
+        var preview = body.length > 72 ? body.slice(0, 72).trimEnd() + '…' : body;
+        var commentUrl = ev.payload.comment.html_url || ('https://github.com/' + repoFull);
+        var commentLink = '<a class="log-link" href="' + escHtml(commentUrl) + '" target="_blank">' + escHtml(repoName) + '</a>';
+        entries.push({ date: date, type: 'comment', html: 'commented on a commit in ' + commentLink + (preview ? ': <span class="log-preview">' + escHtml(preview) + '</span>' : '') });
       }
     });
   }
 
   entries.sort(function(a, b) {
-    return b.date < a.date ? -1 : b.date > a.date ? 1 : 0;
+    return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
   });
   entries = entries.slice(0, 12);
 

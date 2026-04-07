@@ -988,3 +988,6 @@ input[type="text"]::placeholder { color: var(--fg-dim); }
   #ot-right { padding: 18px 16px; overflow-y: visible; }
   .ot-ind-name, .ot-cargo-heading { font-size: 18px; }
 }
+
+.badge-comment { background: #79dac820; border-color: #79dac840; color: #79dac8; }
+.log-preview { color: #616161; font-style: italic; }
