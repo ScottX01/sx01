@@ -1,14 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=DM+Mono:wght@400;500&display=swap');
 
-/* ── Log feed wrapper ───────────────────────────────────────────────────────── */
-
 .log-wrap {
   max-width: 680px;
   margin: 0 auto;
   font-family: 'DM Mono', monospace;
 }
-
-/* ── Prompt header ──────────────────────────────────────────────────────────── */
 
 .log-prompt {
   font-size: 13px;
@@ -29,10 +25,8 @@
   background: var(--blue);
   margin-left: 3px;
   vertical-align: text-bottom;
-  animation: blink 1s step-end infinite; /* reuses keyframe from styles.css */
+  animation: blink 1s step-end infinite;
 }
-
-/* ── Status lines ───────────────────────────────────────────────────────────── */
 
 .log-status {
   font-size: 13px;
@@ -42,8 +36,6 @@
 .log-status.is-error {
   color: var(--red);
 }
-
-/* ── Log rows ───────────────────────────────────────────────────────────────── */
 
 #log-feed {
   display: flex;
@@ -69,8 +61,6 @@
   white-space: nowrap;
 }
 
-/* ── Type badges ────────────────────────────────────────────────────────────── */
-
 .log-badge {
   display: inline-flex;
   align-items: center;
@@ -90,8 +80,6 @@
 .badge-wip    { background: #e3c78a20; border-color: #e3c78a40; color: var(--yellow); }
 .badge-note   { background: #61616120; border-color: #61616140; color: var(--fg-dim); }
 
-/* ── Log text ───────────────────────────────────────────────────────────────── */
-
 .log-text {
   font-size: 13px;
   color: var(--fg);
@@ -105,8 +93,6 @@
 .log-link:hover {
   text-decoration: underline;
 }
-
-/* ── Mobile ─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 600px) {
   .log-row {
